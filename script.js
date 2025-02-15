@@ -9,12 +9,12 @@ var starArray = [];
 
 // Image URLs for each text
 var images = [
-    "https://github.com/HazarUcan/-z-r-sitesi/blob/main/5DC788E6-D94A-4527-B073-940E41C483F0.jpg?raw=true",
-    "https://github.com/HazarUcan/-z-r-sitesi/blob/main/5175D03F-5744-4374-BBEC-8161B2EF1DF1.jpg?raw=true",
-    "https://github.com/HazarUcan/-z-r-sitesi/blob/main/IMG_8967.jpeg?raw=true",
-    "https://github.com/HazarUcan/-z-r-sitesi/blob/main/IMG_9401.PNG?raw=true",
-    "https://github.com/HazarUcan/-z-r-sitesi/blob/main/fb072237-7cc3-4f53-8450-95f628973749.jpg?raw=true",
-    "https://github.com/HazarUcan/-z-r-sitesi/blob/main/IMG_0936.jpeg?raw=true"
+    "https://raw.githubusercontent.com/HazarUcan/-z-r-sitesi/main/5DC788E6-D94A-4527-B073-940E41C483F0.jpg",
+    "https://raw.githubusercontent.com/HazarUcan/-z-r-sitesi/main/5175D03F-5744-4374-BBEC-8161B2EF1DF1.jpg",
+    "https://raw.githubusercontent.com/HazarUcan/-z-r-sitesi/main/IMG_8967.jpeg",
+    "https://raw.githubusercontent.com/HazarUcan/-z-r-sitesi/main/IMG_9401.PNG",
+    "https://raw.githubusercontent.com/HazarUcan/-z-r-sitesi/main/fb072237-7cc3-4f53-8450-95f628973749.jpg",
+    "https://raw.githubusercontent.com/HazarUcan/-z-r-sitesi/main/IMG_0936.jpeg"
 ];
 
 // Text for each transition
@@ -33,8 +33,8 @@ function getRandom(min, max) {
 
 // Initialize stars
 for (var i = 0; i < stars; i++) {
-    var x = Math.random() * canvas.offsetWidth;
-    var y = Math.random() * canvas.offsetHeight;
+    var x = Math.random() * canvas.width;
+    var y = Math.random() * canvas.height;
     var radius = Math.random() * 1.2;
     var hue = colorrange[getRandom(0, colorrange.length - 1)];
     var sat = getRandom(50, 100);
@@ -58,6 +58,10 @@ function drawImage(index) {
         var imgY = canvas.height / 2 + 50;  // Position under text
         context.drawImage(img, imgX, imgY, imgWidth, imgHeight);
     };
+
+    img.onerror = function () {
+        console.error("Failed to load image:", images[index]);
+    };
 }
 
 function drawStars() {
@@ -65,7 +69,7 @@ function drawStars() {
         var star = starArray[i];
 
         context.beginPath();
-        context.arc(star.x, star.y, star.radius, 0, 360);
+        context.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
         context.fillStyle = "hsla(" + star.hue + ", " + star.sat + "%, 88%, " + star.opacity + ")";
         context.fill();
     }
@@ -85,10 +89,10 @@ function drawText() {
     var lineHeight = 8;
     context.font = fontSize + "px Comic Sans MS";
     context.textAlign = "center";
-    
+
     // Glow effect
-    context.shadowColor = "rgba(45, 45, 255, 1)";
-    context.shadowBlur = 8;
+    context.shadowColor = "rgba(255, 255, 255, 1)";
+    context.shadowBlur = 10;
 
     let duration = 500; // Time for fade-in & fade-out per text
     let totalFrames = texts.length * duration; // Total animation cycle
@@ -98,13 +102,13 @@ function drawText() {
 
     let localFrame = frameNumber % duration;
     if (localFrame < duration / 2) {
-        opacity += 0.01;
+        opacity = Math.min(opacity + 0.01, 1); // Prevent opacity from exceeding 1
     } else {
-        opacity -= 0.01;
+        opacity = Math.max(opacity - 0.01, 0); // Prevent opacity from going negative
     }
 
-    context.fillStyle = `rgba(45, 45, 255, ${opacity})`;
-    context.fillText(texts[textIndex], canvas.width / 2, canvas.height / 2);
+    context.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+    context.fillText(texts[textIndex], canvas.width / 2, canvas.height / 2 - 50);
     drawImage(textIndex);
 
     // Reset shadow effect
