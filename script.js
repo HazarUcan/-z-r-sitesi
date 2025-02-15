@@ -17,7 +17,7 @@ var images = [
     "https://raw.githubusercontent.com/HazarUcan/-z-r-sitesi/main/IMG_0936.jpeg"
 ];
 
-// Text for each transition
+// Texts for each transition
 var texts = [
     "Her gün seninle birlikte olduğum için ne kadar şanslı olduğumu düşünüyorum",
     "Yaşayabileceğim onca hayattan, Yaşar hazırlığında tanışmak",
@@ -38,33 +38,11 @@ for (var i = 0; i < stars; i++) {
     starArray.push({ x, y, radius, hue, sat, opacity });
 }
 
+// Animation control variables
 var frameNumber = 0;
-var opacity = 0;
 var textIndex = 0;
+var opacity = 0;
 var fadeIn = true;
-
-// Function to draw an image under the text
-function drawImage(index) {
-    var img = new Image();
-    img.src = images[index]; // Load the correct image
-
-    img.onload = function () {
-        var imgWidth = canvas.width * 0.6; // Scale the image
-        var imgHeight = imgWidth * (img.height / img.width); // Maintain aspect ratio
-        var imgX = (canvas.width - imgWidth) / 2;
-        var imgY = canvas.height / 2 + 50;  // Position under text
-        context.drawImage(img, imgX, imgY, imgWidth, imgHeight);
-    };
-}
-
-// Function to update stars (twinkling effect)
-function updateStars() {
-    for (var i = 0; i < stars; i++) {
-        if (Math.random() > 0.99) {
-            starArray[i].opacity = Math.random();
-        }
-    }
-}
 
 // Function to draw stars
 function drawStars() {
@@ -77,10 +55,32 @@ function drawStars() {
     }
 }
 
-// Function to display text with fade-in and fade-out effect
+// Function to update stars (twinkling effect)
+function updateStars() {
+    for (var i = 0; i < stars; i++) {
+        if (Math.random() > 0.99) {
+            starArray[i].opacity = Math.random();
+        }
+    }
+}
+
+// Function to draw an image under the text
+function drawImage(index) {
+    var img = new Image();
+    img.src = images[index]; 
+
+    img.onload = function () {
+        var imgWidth = canvas.width * 0.6; // Scale the image
+        var imgHeight = imgWidth * (img.height / img.width); // Maintain aspect ratio
+        var imgX = (canvas.width - imgWidth) / 2;
+        var imgY = canvas.height / 2 + 50;  
+        context.drawImage(img, imgX, imgY, imgWidth, imgHeight);
+    };
+}
+
+// Function to draw text with fade-in and fade-out effect
 function drawText() {
     var fontSize = Math.min(30, window.innerWidth / 24);
-    var lineHeight = 8;
     context.font = fontSize + "px Comic Sans MS";
     context.textAlign = "center";
 
@@ -88,22 +88,28 @@ function drawText() {
     context.shadowColor = "rgba(255, 255, 255, 1)";
     context.shadowBlur = 10;
 
+    let transitionSpeed = 0.005;  // Slow down transitions
+
     // Fade-in and fade-out timing
     if (fadeIn) {
-        opacity += 0.01; // Increase opacity
+        opacity += transitionSpeed; 
         if (opacity >= 1) {
-            fadeIn = false;
+            opacity = 1;
+            fadeIn = false;  // Start fade-out after holding text
+            setTimeout(() => { fadeIn = true; textIndex = (textIndex + 1) % texts.length; }, 1500);
         }
     } else {
-        opacity -= 0.01; // Decrease opacity
+        opacity -= transitionSpeed;  
         if (opacity <= 0) {
-            fadeIn = true;
-            textIndex = (textIndex + 1) % texts.length; // Move to the next text
+            opacity = 0;
         }
     }
 
+    // Draw the text
     context.fillStyle = `rgba(255, 255, 255, ${opacity})`;
     context.fillText(texts[textIndex], canvas.width / 2, canvas.height / 2 - 50);
+    
+    // Draw the image under the text
     drawImage(textIndex);
 
     // Reset shadow effect
@@ -129,3 +135,4 @@ window.addEventListener("resize", function () {
 });
 
 window.requestAnimationFrame(draw);
+
