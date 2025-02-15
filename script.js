@@ -23,21 +23,17 @@ var texts = [
     "Yaşayabileceğim onca hayattan, Yaşar hazırlığında tanışmak",
     "Arada çok salak bir adam olabiliyorum",
     "Bazen konuşurken çok sinir bozucu da olabiliyoruz",
-    "Ama ağzımdan çıkanlar yüzünden, En son kaybetmek isticeğim insan sensin",
+    "Ama ağzımdan çıkanlar yüzünden, En son kaybetmek isteyeceğim insan sensin",
     "Umarım ömrüm boyunca, Geceleri sinirimi bozmaya devam edersin"
 ];
-
-function getRandom(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 // Initialize stars
 for (var i = 0; i < stars; i++) {
     var x = Math.random() * canvas.width;
     var y = Math.random() * canvas.height;
     var radius = Math.random() * 1.2;
-    var hue = colorrange[getRandom(0, colorrange.length - 1)];
-    var sat = getRandom(50, 100);
+    var hue = colorrange[Math.floor(Math.random() * colorrange.length)];
+    var sat = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
     var opacity = Math.random();
     starArray.push({ x, y, radius, hue, sat, opacity });
 }
@@ -45,41 +41,39 @@ for (var i = 0; i < stars; i++) {
 var frameNumber = 0;
 var opacity = 0;
 var textIndex = 0;
+var fadeIn = true;
 
 // Function to draw an image under the text
 function drawImage(index) {
     var img = new Image();
     img.src = images[index]; // Load the correct image
 
-    img.onload = function() {
+    img.onload = function () {
         var imgWidth = canvas.width * 0.6; // Scale the image
         var imgHeight = imgWidth * (img.height / img.width); // Maintain aspect ratio
         var imgX = (canvas.width - imgWidth) / 2;
         var imgY = canvas.height / 2 + 50;  // Position under text
         context.drawImage(img, imgX, imgY, imgWidth, imgHeight);
     };
-
-    img.onerror = function () {
-        console.error("Failed to load image:", images[index]);
-    };
 }
 
-function drawStars() {
-    for (var i = 0; i < stars; i++) {
-        var star = starArray[i];
-
-        context.beginPath();
-        context.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
-        context.fillStyle = "hsla(" + star.hue + ", " + star.sat + "%, 88%, " + star.opacity + ")";
-        context.fill();
-    }
-}
-
+// Function to update stars (twinkling effect)
 function updateStars() {
     for (var i = 0; i < stars; i++) {
         if (Math.random() > 0.99) {
             starArray[i].opacity = Math.random();
         }
+    }
+}
+
+// Function to draw stars
+function drawStars() {
+    for (var i = 0; i < stars; i++) {
+        var star = starArray[i];
+        context.beginPath();
+        context.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
+        context.fillStyle = "hsla(" + star.hue + ", " + star.sat + "%, 88%, " + star.opacity + ")";
+        context.fill();
     }
 }
 
@@ -94,17 +88,18 @@ function drawText() {
     context.shadowColor = "rgba(255, 255, 255, 1)";
     context.shadowBlur = 10;
 
-    let duration = 500; // Time for fade-in & fade-out per text
-    let totalFrames = texts.length * duration; // Total animation cycle
-
-    // Calculate which text & image to display
-    textIndex = Math.floor(frameNumber / duration) % texts.length;
-
-    let localFrame = frameNumber % duration;
-    if (localFrame < duration / 2) {
-        opacity = Math.min(opacity + 0.01, 1); // Prevent opacity from exceeding 1
+    // Fade-in and fade-out timing
+    if (fadeIn) {
+        opacity += 0.01; // Increase opacity
+        if (opacity >= 1) {
+            fadeIn = false;
+        }
     } else {
-        opacity = Math.max(opacity - 0.01, 0); // Prevent opacity from going negative
+        opacity -= 0.01; // Decrease opacity
+        if (opacity <= 0) {
+            fadeIn = true;
+            textIndex = (textIndex + 1) % texts.length; // Move to the next text
+        }
     }
 
     context.fillStyle = `rgba(255, 255, 255, ${opacity})`;
@@ -116,6 +111,7 @@ function drawText() {
     context.shadowBlur = 0;
 }
 
+// Function to draw everything in a loop
 function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
     drawStars();
@@ -126,6 +122,7 @@ function draw() {
     window.requestAnimationFrame(draw);
 }
 
+// Resize canvas when the window resizes
 window.addEventListener("resize", function () {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
