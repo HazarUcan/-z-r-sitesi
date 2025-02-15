@@ -7,15 +7,31 @@ var stars = 500;
 var colorrange = [0, 60, 240];
 var starArray = [];
 
-// Load the image
-var img = new Image();
-img.src = "your-image-path.jpg";  // Replace with the actual image URL
+// Image URLs for each text
+var images = [
+    "https://github.com/HazarUcan/-z-r-sitesi/blob/main/5DC788E6-D94A-4527-B073-940E41C483F0.jpg?raw=true",
+    "https://github.com/HazarUcan/-z-r-sitesi/blob/main/5175D03F-5744-4374-BBEC-8161B2EF1DF1.jpg?raw=true",
+    "https://github.com/HazarUcan/-z-r-sitesi/blob/main/IMG_8967.jpeg?raw=true",
+    "https://github.com/HazarUcan/-z-r-sitesi/blob/main/IMG_9401.PNG?raw=true",
+    "https://github.com/HazarUcan/-z-r-sitesi/blob/main/fb072237-7cc3-4f53-8450-95f628973749.jpg?raw=true",
+    "https://github.com/HazarUcan/-z-r-sitesi/blob/main/IMG_0936.jpeg?raw=true"
+];
+
+// Text for each transition
+var texts = [
+    "Her gün seninle birlikte olduğum için ne kadar şanslı olduğumu düşünüyorum",
+    "Yaşayabileceğim onca hayattan, Yaşar hazırlığında tanışmak",
+    "Arada çok salak bir adam olabiliyorum",
+    "Bazen konuşurken çok sinir bozucu da olabiliyoruz",
+    "Ama ağzımdan çıkanlar yüzünden, En son kaybetmek isticeğim insan sensin",
+    "Umarım ömrüm boyunca, Geceleri sinirimi bozmaya devam edersin"
+];
 
 function getRandom(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// Initialize stars with random opacity values
+// Initialize stars
 for (var i = 0; i < stars; i++) {
     var x = Math.random() * canvas.offsetWidth;
     var y = Math.random() * canvas.offsetHeight;
@@ -28,8 +44,21 @@ for (var i = 0; i < stars; i++) {
 
 var frameNumber = 0;
 var opacity = 0;
-var secondOpacity = 0;
-var thirdOpacity = 0;
+var textIndex = 0;
+
+// Function to draw an image under the text
+function drawImage(index) {
+    var img = new Image();
+    img.src = images[index]; // Load the correct image
+
+    img.onload = function() {
+        var imgWidth = canvas.width * 0.6; // Scale the image
+        var imgHeight = imgWidth * (img.height / img.width); // Maintain aspect ratio
+        var imgX = (canvas.width - imgWidth) / 2;
+        var imgY = canvas.height / 2 + 50;  // Position under text
+        context.drawImage(img, imgX, imgY, imgWidth, imgHeight);
+    };
+}
 
 function drawStars() {
     for (var i = 0; i < stars; i++) {
@@ -50,113 +79,33 @@ function updateStars() {
     }
 }
 
-// Function to draw the image under the text
-function drawImage() {
-    var imgWidth = canvas.width * 0.6; // Scale image to fit
-    var imgHeight = imgWidth * (img.height / img.width); // Maintain aspect ratio
-    var imgX = (canvas.width - imgWidth) / 2;
-    var imgY = canvas.height / 2 + 30;  // Adjust placement to be under text
-    context.drawImage(img, imgX, imgY, imgWidth, imgHeight);
-}
-
-function drawTextWithLineBreaks(lines, x, y, fontSize, lineHeight) {
-    lines.forEach((line, index) => {
-        context.fillText(line, x, y + index * (fontSize + lineHeight));
-    });
-}
-
+// Function to display text with fade-in and fade-out effect
 function drawText() {
     var fontSize = Math.min(30, window.innerWidth / 24);
     var lineHeight = 8;
-
     context.font = fontSize + "px Comic Sans MS";
     context.textAlign = "center";
-
+    
     // Glow effect
     context.shadowColor = "rgba(45, 45, 255, 1)";
     context.shadowBlur = 8;
 
-    if(frameNumber < 250){
-        context.fillStyle = `rgba(45, 45, 255, ${opacity})`;
-        context.fillText("Her gün seninle birlikte olduğum için ne kadar şanslı olduğumu düşünüyorum", canvas.width/2, canvas.height/2);
-        drawImage(); // Draw image under text
+    let duration = 500; // Time for fade-in & fade-out per text
+    let totalFrames = texts.length * duration; // Total animation cycle
+
+    // Calculate which text & image to display
+    textIndex = Math.floor(frameNumber / duration) % texts.length;
+
+    let localFrame = frameNumber % duration;
+    if (localFrame < duration / 2) {
         opacity += 0.01;
-    }
-    if(frameNumber >= 250 && frameNumber < 500){
-        context.fillStyle = `rgba(45, 45, 255, ${opacity})`;
-        context.fillText("Her gün seninle birlikte olduğum için ne kadar şanslı olduğumu düşünüyorum", canvas.width/2, canvas.height/2);
-        drawImage();
+    } else {
         opacity -= 0.01;
     }
 
-    if(frameNumber == 500) opacity = 0;
-
-    if(frameNumber > 500 && frameNumber < 750){
-        context.fillStyle = `rgba(45, 45, 255, ${opacity})`;
-        context.fillText("Yaşayabileceğim onca hayattan, Yaşar hazırlığında tanışmak", canvas.width/2, canvas.height/2);
-        drawImage();
-        opacity += 0.01;
-    }
-    if(frameNumber >= 750 && frameNumber < 1000){
-        context.fillStyle = `rgba(45, 45, 255, ${opacity})`;
-        context.fillText("Yaşayabileceğim onca hayattan, Yaşar hazırlığında tanışmak", canvas.width/2, canvas.height/2);
-        drawImage();
-        opacity -= 0.01;
-    }
-
-    if(frameNumber == 1000) opacity = 0;
-
-    if(frameNumber > 1000 && frameNumber < 1250){
-        context.fillStyle = `rgba(45, 45, 255, ${opacity})`;
-        context.fillText("Arada çok salak bir adam olabiliyorum", canvas.width/2, canvas.height/2);
-        drawImage();
-        opacity += 0.01;
-    }
-    if(frameNumber >= 1250 && frameNumber < 1500){
-        context.fillStyle = `rgba(45, 45, 255, ${opacity})`;
-        context.fillText("Arada çok salak bir adam olabiliyorum", canvas.width/2, canvas.height/2);
-        drawImage();
-        opacity -= 0.01;
-    }
-
-    if(frameNumber == 1500) opacity = 0;
-
-    if(frameNumber > 1500 && frameNumber < 1750){
-        context.fillStyle = `rgba(45, 45, 255, ${opacity})`;
-        context.fillText("Bazen konuşurken çok sinir bozucu da olabiliyoruz", canvas.width/2, canvas.height/2);
-        drawImage();
-        opacity += 0.01;
-    }
-    if(frameNumber >= 1750 && frameNumber < 2000){
-        context.fillStyle = `rgba(45, 45, 255, ${opacity})`;
-        context.fillText("Bazen konuşurken çok sinir bozucu da olabiliyoruz", canvas.width/2, canvas.height/2);
-        drawImage();
-        opacity -= 0.01;
-    }
-
-    if(frameNumber == 2000) opacity = 0;
-
-    if(frameNumber > 2000 && frameNumber < 2250){
-        context.fillStyle = `rgba(45, 45, 255, ${opacity})`;
-        context.fillText("Ama ağzımdan çıkanlar yüzünden, En son kaybetmek isticeğim insan sensin", canvas.width/2, canvas.height/2);
-        drawImage();
-        opacity += 0.01;
-    }
-    if(frameNumber >= 2250 && frameNumber < 2500){
-        context.fillStyle = `rgba(45, 45, 255, ${opacity})`;
-        context.fillText("Ama ağzımdan çıkanlar yüzünden, En son kaybetmek isticeğim insan sensin", canvas.width/2, canvas.height/2);
-        drawImage();
-        opacity -= 0.01;
-    }
-
-    if(frameNumber == 2500) opacity = 0;
-
-    if(frameNumber > 2500 && frameNumber < 99999){
-        context.fillStyle = `rgba(45, 45, 255, ${opacity})`;
-        context.fillText("Umarım ömrüm boyunca, Geceleri sinirimi bozmaya devam edersin", canvas.width/2, canvas.height/2);
-        drawImage();
-        opacity += 0.01;
-    }
+    context.fillStyle = `rgba(45, 45, 255, ${opacity})`;
+    context.fillText(texts[textIndex], canvas.width / 2, canvas.height / 2);
+    drawImage(textIndex);
 
     // Reset shadow effect
     context.shadowColor = "transparent";
@@ -169,9 +118,7 @@ function draw() {
     updateStars();
     drawText();
 
-    if (frameNumber < 99999) {
-        frameNumber++;
-    }
+    frameNumber++;
     window.requestAnimationFrame(draw);
 }
 
